@@ -1,0 +1,41 @@
+[project]
+name = "governed-mcp"
+version = "0.1.0"
+description = "A governance gateway for MCP: policy, human approvals, step-derived idempotency keys, read-after-write checks and a hash-chained audit log in front of any MCP server."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Pavan Kumar Guthikonda" }]
+requires-python = ">=3.12"
+keywords = ["mcp", "claude", "agents", "governance", "approvals", "audit"]
+dependencies = [
+    "mcp>=2.3,<3",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+agent = ["claude-agent-sdk>=0.2.178"]
+
+[project.scripts]
+governed-mcp = "governed_mcp.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/pavansky/governed-mcp"
+
+[build-system]
+requires = ["uv_build>=0.11.27,<0.12.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+    "pytest-asyncio>=1.4",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"

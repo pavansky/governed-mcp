@@ -1,0 +1,7 @@
+{
+  "name": "governed-mcp",
+  "description": "Agent skills for proposing changes through a governed MCP server, triaging incidents safely, and authoring governance policies.",
+  "version": "0.1.0",
+  "author": { "name": "Pavan Kumar Guthikonda" },
+  "license": "MIT"
+}

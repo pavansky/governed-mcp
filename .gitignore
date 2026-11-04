@@ -1,0 +1,14 @@
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.venv
+.pytest_cache/
+.governed/
+*.db
+*.db-wal
+*.db-shm
+.env
+evals/results/

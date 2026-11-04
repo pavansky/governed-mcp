@@ -1,0 +1,54 @@
+# governed-mcp configuration for the fake CRM demo.
+# Paths are relative to this file. The demo keeps all state in examples/.governed/.
+
+downstream:
+  command: python                       # this interpreter
+  args: ["-m", "examples.crm_server"]
+  cwd: ..                               # repo root, so `examples` imports
+  env:
+    CRM_DB: examples/.governed/crm.json   # relative to cwd (the repo root)
+
+db: .governed/governed.db
+
+policy:
+  # Anything not matched below, that is not annotated read-only, waits for a person.
+  default: require_approval
+  read_default: allow
+  approval_ttl_s: 3600
+  idempotency_arg: idempotency_key
+
+  rules:
+    - tool: "get_*"
+      action: allow
+    - tool: search_tickets
+      action: allow
+
+    # Low-risk write: an internal comment goes straight through.
+    - tool: add_comment
+      action: allow
+
+    # Ticket changes need a person...
+    - tool: update_ticket
+      action: require_approval
+      reason: ticket changes are reviewed by the on-call lead
+
+    # ...and refunds always do, with a hard ceiling no approval can lift.
+    - tool: issue_refund
+      action: require_approval
+      reason: refunds are reviewed by finance
+    - tool: issue_refund
+      when: {path: amount, gt: 500}
+      action: deny
+      reason: refunds over 500 go through the finance system, not an agent
+
+    # Destructive tools are off the table.
+    - tool: "delete_*"
+      action: deny
+      reason: deletion is never delegated to an agent
+
+  # Read-after-write: after update_ticket, read the ticket back and compare.
+  verify:
+    update_ticket:
+      read: get_ticket
+      args: {ticket_id: "{ticket_id}"}
+      expect: {status: "{status}", priority: "{priority}", assignee: "{assignee}"}
